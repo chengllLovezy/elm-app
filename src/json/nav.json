@@ -1,0 +1,36 @@
+{
+  "foodNavList":[
+    {
+      "imgUrl":"/2/35/696aa5cf9820adada9b11a3d14bf5jpeg.jpeg",
+      "text":"甜品饮品"
+    },
+    {
+      "imgUrl":"/0/da/f42235e6929a5cb0e7013115ce78djpeg.jpeg",
+      "text":"商超便利"
+    },
+    {
+      "imgUrl":"/d/38/7bddb07503aea4b711236348e2632jpeg.jpeg",
+      "text":"简餐"
+    },
+    {
+      "imgUrl":"/3/c7/a9ef469a12e7a596b559145b87f09jpeg.jpeg",
+      "text":"麻辣烫"
+    },
+    {
+      "imgUrl":"/4/34/ea0d51c9608310cf41faa5de6b8efjpeg.jpeg",
+      "text":"果蔬生鲜"
+    },
+    {
+      "imgUrl":"/b/7f/432619fb21a40b05cd25d11eca02djpeg.jpeg",
+      "text":"汉堡薯条"
+    },
+    {
+      "imgUrl":"/3/84/8e031bf7b3c036b4ec19edff16e46jpeg.jpeg",
+      "text":"准时达"
+    },
+    {
+      "imgUrl":"/8/83/171fd98b85dee3b3f4243b7459b48jpeg.jpeg",
+      "text":"鲜花蛋糕"
+    }
+  ]
+}
