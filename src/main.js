@@ -7,9 +7,17 @@ import Mini from 'mint-ui'
 import 'mint-ui/lib/style.css'
 import Icon from 'vue-svg-icon/Icon.vue'
 import './config/rem'
+import VueAwesomeSwiper from 'vue-awesome-swiper'
+import 'swiper/dist/css/swiper.css'
+import * as filter from './js/filter'
+
+Object.keys(filter).forEach(key=>{
+  Vue.filter(key,filter[key])
+});
 
 Vue.component('icon',Icon);
 Vue.use(Mini);
+Vue.use(VueAwesomeSwiper)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

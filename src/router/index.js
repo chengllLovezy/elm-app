@@ -6,6 +6,8 @@ import Find from '@/page/find/find'
 import Order from '@/page/order/order'
 import Profile from '@/page/profile/profile'
 
+import Shop from '@/page/Shop/Shop'
+
 Vue.use(Router)
 
 export default new Router({
@@ -31,6 +33,10 @@ export default new Router({
           component:Profile
         }
       ]
+    },
+    {
+      path:'/shop',
+      component:Shop
     }
   ]
 })

@@ -13,6 +13,8 @@
       }
     }
 </script>
-<style>
-
+<style lang="scss">
+.mint-tabbar{
+  position: fixed;
+}
 </style>

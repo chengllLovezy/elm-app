@@ -12,4 +12,12 @@ export default {
 
 <style lang="scss">
 @import "./style/common.scss";
+@import "./style/base.scss";
+  body{
+    background: #f5f5f5;
+  }
+  #app{
+    width: 100%;
+    height: 100%;
+  }
 </style>

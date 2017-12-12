@@ -8,6 +8,16 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 
+/*增加express*/
+// const express = require('express');
+// const app = express();
+//
+// let dataJson = require('../json/nav.json');
+//
+// let router = express.Router();
+// app.use('/api',router)
+
+
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
@@ -33,7 +43,65 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     quiet: true, // necessary for FriendlyErrorsPlugin
     watchOptions: {
       poll: config.dev.poll,
-    }
+    },
+
+    /*增加before*/
+    // before(app){
+    //   app.get('/api/foodNav',(req, res)=>{
+    //     res.json({
+    //       status:0,
+    //       data:dataJson.foodNavList
+    //     })
+    //   });
+    //   app.get('/api/adsBanner',(req, res)=>{
+    //     res.json({
+    //       status:0,
+    //       data:dataJson.adsBanner
+    //     })
+    //   });
+    //   app.get('/api/hotRecommend',(req, res)=>{
+    //     res.json({
+    //       status:0,
+    //       data:dataJson.hotRecommend
+    //     })
+    //   });
+    //   // 品质优选
+    //   app.get('/api/qualityOption',(req, res)=>{
+    //     res.json({
+    //       status:0,
+    //       data:dataJson.qualityOption
+    //     })
+    //   });
+    //   app.get('/api/seller',(req, res)=>{
+    //     res.json({
+    //       status:0,
+    //       data:{
+    //         seller:dataJson.seller,
+    //         activityLists:dataJson.activityLists
+    //       }
+    //     })
+    //   });
+    //
+    //   app.get('/api/shop',(req, res)=>{
+    //     let sellerId = parseInt(req.query.sellerId);
+    //     console.log(sellerId)
+    //     let sellerLists = dataJson.seller.sellerLists;
+    //     sellerLists.forEach(function (item,index) {
+    //       if(sellerId === item.seller_id){
+    //         console.log(item.seller_id)
+    //         res.json({
+    //           status:0,
+    //           data:{
+    //             seller:item,
+    //             activityLists:dataJson.activityLists
+    //           }
+    //         })
+    //       }
+    //     });
+    //
+    //   })
+    // }
+    /*结束---*/
   },
   plugins: [
     new webpack.DefinePlugin({
