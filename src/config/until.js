@@ -19,3 +19,4 @@ export const removeCartBuy = (name) => {
   if(!name){return}
   return window.localStorage.removeItem(name);
 };
+
