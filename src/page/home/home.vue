@@ -209,6 +209,7 @@ import axios from 'axios'
 </script>
 <style lang="scss">
   @import "../../style/base.scss";
+
   .home{
     padding-bottom: 2.3rem;
 
