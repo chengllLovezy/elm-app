@@ -479,6 +479,8 @@
         this.detailTouchY = ev.changedTouches[0].clientY;
       },
       detailMoveUp(ev){
+
+        
         ev.preventDefault();
         let y = ev.changedTouches[0].clientY;
         let dis = this.detailTouchY - y;
