@@ -8,6 +8,7 @@ const INIT_CART = 'INIT_CART';//网页初始化，调用本地缓存购物列表
 
 import { setCartBuy, getCartBuy } from '../config/until'
 
+
 export default {
   [ADD_CART](state,foodsItem){
     // let cart = state.cartLists;

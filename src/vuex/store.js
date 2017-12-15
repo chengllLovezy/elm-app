@@ -12,6 +12,7 @@ const state = {
   cartLists:{},//购物车信息
 };
 
+
 export default new Vuex.Store({
   state,
   mutations,
