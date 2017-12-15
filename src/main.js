@@ -10,6 +10,7 @@ import './config/rem'
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import 'swiper/dist/css/swiper.css'
 import * as filter from './js/filter'
+import store from './vuex/store'
 
 Object.keys(filter).forEach(key=>{
   Vue.filter(key,filter[key])
@@ -24,6 +25,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: { App }
 })
