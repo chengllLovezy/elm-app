@@ -1,4 +1,3 @@
-
 let currencyFilter = (val) => {
   return '¥'+val
 };

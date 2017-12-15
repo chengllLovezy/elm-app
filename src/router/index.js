@@ -10,6 +10,7 @@ import Shop from '@/page/Shop/Shop'
 
 Vue.use(Router)
 
+
 export default new Router({
   routes: [
     {
