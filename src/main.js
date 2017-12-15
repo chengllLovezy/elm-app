@@ -12,6 +12,7 @@ import 'swiper/dist/css/swiper.css'
 import * as filter from './js/filter'
 import store from './vuex/store'
 
+
 Object.keys(filter).forEach(key=>{
   Vue.filter(key,filter[key])
 });
