@@ -4,17 +4,14 @@
         <div class="address-wrap">
           <div class="address-box">
             <span class="address-icon"></span>
-            <!--<icon name="address" width="1rem" height="1rem"></icon>-->
             <span class="address-text">地址</span>
             <span class="down-icon"></span>
-            <!--<icon name="address-down" width="0.5rem" height="0.5rem"></icon>-->
           </div>
           <div class="weather-box">天气</div>
         </div>
         <!--搜索商品-->
         <div class="search-wrap">
           <span class="search-icon"></span>
-          <!--<icon name="search" width="0.9rem" height="0.9rem"></icon>-->
           <span class="search-text">搜索商家、商品名称</span>
         </div>
         <!--搜索热词-->
@@ -111,8 +108,8 @@
                     <icon name="rate-active"></icon>
                   </div>
                 </div>
-                <span class="rate-score">{{item.score}}</span>
-                <span class="salenum">月售{{item.month_sale}}单</span>
+                <span class="rate-score">{{item.score.total_score}}</span>
+                <span class="salenum">月售{{item.mouth_sale}}单</span>
               </div>
               <div class="rate-icon">
                 <div class="rate-za"></div>
@@ -596,7 +593,7 @@ import axios from 'axios'
               .rate-za{
                 width: 2rem;
                 height: 0.6rem;
-                background: url("../../images/za.png") no-repeat;
+                background: url("../../images/za.jpg") no-repeat;
                 background-size: contain;
               }
             }
@@ -661,6 +658,11 @@ import axios from 'axios'
           }
         }
       }
+    }
+
+    .mint-tabbar{
+      position: fixed;
+      z-index: 5000;
     }
   }
 </style>

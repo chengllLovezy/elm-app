@@ -17,6 +17,7 @@ $color-14b2ff:#14b2ff;
 $color-6f3f15:#6f3f15;//品牌的颜色
 $color-price:#ff5339;//价格的颜色
 $color-money:#a9a9ab;//cart中总价的颜色
+$color-satisfy:#ffaa0c;//满意的颜色
 
 
 //backgroung背景色
@@ -88,10 +89,58 @@ $font-size-2-0:2.0rem;
   bottom: -1px;
   left: 0;
 }
+.border-bottom-dotted{
+  position: relative;
+}
+.border-bottom-dotted:after{
+  content: '';
+  width: 100%;
+  height: 1px;
+  border-bottom:1px dashed #ccc;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+}
+.border-bottom-dashed{
+  position: relative;
+}
+.border-bottom-dashed:after{
+  content: '';
+  width: 100%;
+  height: 1px;
+  border-bottom:1px dotted #ccc;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+}
+.border-left{
+  position: relative;
+}
+.border-left:after{
+  content: '';
+  width: 100%;
+  height: 100%;
+  border-left:1px solid #eee;
+  position: absolute;
+  bottom: 0;
+  left: -1px;
+}
 //定义设备像素比
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio:2) {
   .border-bottom:after{
     transform: scaleY(0.5);
+    transform-origin: 0 0;
+  }
+  .border-bottom-dotted:after{
+    transform: scaleY(0.5);
+    transform-origin: 0 0;
+  }
+  .border-bottom-dashed:after{
+    transform: scaleY(0.5);
+    transform-origin: 0 0;
+  }
+  .border-left:after{
+    transform: scaleX(0.5);
     transform-origin: 0 0;
   }
   .border:before{
@@ -102,6 +151,18 @@ $font-size-2-0:2.0rem;
 @media only screen and (-webkit-min-device-pixel-ratio: 3), only screen and (min-device-pixel-ratio:3) {
   .border-bottom:after{
     transform: scaleY(0.333);
+    transform-origin: 0 0;
+  }
+  .border-bottom-dotted:after{
+    transform: scaleY(0.333);
+    transform-origin: 0 0;
+  }
+  .border-bottom-dashed:after{
+    transform: scaleY(0.333);
+    transform-origin: 0 0;
+  }
+  .border-left:after{
+    transform: scaleX(0.5);
     transform-origin: 0 0;
   }
   .border:before{

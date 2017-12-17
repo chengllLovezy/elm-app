@@ -1,125 +1,120 @@
 <template>
   <div class="shop">
-    <div class="header-bg-box">
-      <div class="header-bg" :style="{backgroundImage:`url(${baseImgUrl}${bgUrl})`}">
-        <div class="header-bg-blur" :style="{backgroundImage:`url(${baseImgUrl}${bgUrl})`}"></div>
-        <div class="header-bg-cover"></div>
-      </div>
 
-      <div class="back-box">
-        <!--顶部返回按钮部分-->
-        <div class="back-wrap">
-          <span class="back-icon" @click="goBack"></span>
-          <div>
-            <span class="spelling-icon"></span>
-            <span class="cart-icon"></span>
-            <span class="more-icon"></span>
+    <div class="header_height" ref="header">
+      <div class="header-bg-box">
+        <div class="header-bg" :style="{backgroundImage:`url(${baseImgUrl}${bgUrl})`}">
+          <div class="header-bg-blur" :style="{backgroundImage:`url(${baseImgUrl}${bgUrl})`}"></div>
+          <div class="header-bg-cover"></div>
+        </div>
+
+        <div class="back-box">
+          <!--顶部返回按钮部分-->
+          <div class="back-wrap">
+            <span class="back-icon" @click="goBack"></span>
+            <div>
+              <span class="spelling-icon"></span>
+              <span class="cart-icon"></span>
+              <span class="more-icon"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header">
+
+          <!--商家头像及信息部分-->
+          <div class="seller">
+            <div class="seller-avater">
+              <img class="avater" :src="baseImgUrl+storeInfo.head_img" alt="">
+            </div>
+            <div class="seller-info">
+              <h2 class="title">
+                <span class="text ellipsis">{{storeInfo.store_name}}</span>
+                <span class="right-icon"></span>
+              </h2>
+              <p class="description ellipsis">{{storeInfo.description}}</p>
+              <p class="brand">
+                <span class="pinpai-icon"></span>
+                <span class="take-time">蜂鸟专送·约34分钟</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="header">
-
-        <!--商家头像及信息部分-->
-        <div class="seller">
-          <div class="seller-avater">
-            <img class="avater" :src="baseImgUrl+storeInfo.head_img" alt="">
+      <!--商家活动-->
+      <div class="activity-box">
+        <div class="activity" @click="activityShow = true;">
+          <div class="active-lists">
+            <!--活动列表-->
+            <div class="item ellipsis">
+              <!--减  首  特  的样式-->
+              <span class="item-icon" v-for="active_icon in activityStyle" v-if="active_icon.active_id === activeFir.active_id"
+                    :style="{background:active_icon.bgcolor}">{{active_icon.text}}</span>
+              <span class="text">{{activeFir.contentText}}</span>
+            </div>
           </div>
-          <div class="seller-info">
-            <h2 class="title">
-              <span class="text ellipsis">{{storeInfo.store_name}}</span>
-              <span class="right-icon"></span>
-            </h2>
-            <p class="description ellipsis">{{storeInfo.description}}</p>
-            <p class="brand">
-              <span class="pinpai-icon"></span>
-              <span class="take-time">蜂鸟专送·约34分钟</span>
-            </p>
+          <!--活动数量-->
+          <div class="active-num">
+            <span>{{activityLen}}个活动</span>
+            <span class="active-down"></span>
           </div>
         </div>
       </div>
-    </div>
-
-
-    <!--商家活动-->
-    <div class="activity-box">
-      <div class="activity" @click="activityShow = true;">
-        <div class="active-lists">
-          <!--活动列表-->
-          <div class="item ellipsis">
-            <!--减  首  特  的样式-->
-            <span class="item-icon" v-for="active_icon in activityStyle" v-if="active_icon.active_id === activeFir.active_id"
-                  :style="{background:active_icon.bgcolor}">{{active_icon.text}}</span>
-            <span class="text">{{activeFir.contentText}}</span>
-          </div>
+      <!--商品 评价导航-->
+      <div class="nav-box">
+        <div class="nav border-bottom">
+          <span class="goods" :class="{isActive:isActive}" @click="swiperTab(0)">商品</span>
+          <span class="commit" :class="{isActive:!isActive}" @click="swiperTab(1)">评价</span>
         </div>
-        <!--活动数量-->
-        <div class="active-num">
-          <span>{{activityLen}}个活动</span>
-          <span class="active-down"></span>
-        </div>
-      </div>
-    </div>
-
-    <!--商品 评价导航-->
-    <div class="nav-box">
-      <div class="nav border-bottom">
-        <span class="goods" :class="{isActive:isActive,underline:isActive}" @click="">商品</span>
-        <span class="commit" :class="{isActive:!isActive,underline:!isActive}" @click="">评价{{storeInfo.score}}分</span>
-      </div>
-    </div>
-
-    <div ref="ball">
-      <div v-for="ball in balls">
-        <transition @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
-          <div class="ball" v-show="ball.show">
-            <div class="inner inner-hook">1</div>
-          </div>
-        </transition>
       </div>
     </div>
 
     <!--导航  商品  --列表-->
-    <div class="foodsList">
-
-      <!--商品 评价 滑动列表-->
-      <div class="shop-swiper-box">
-        <!--左侧商品导航-->
-        <div class="navSwiper" ref="menuList">
-          <div class="lists">
-            <div v-for="(item,index) in menusLists" :key="index" class="item border-bottom"
-                 :class="{activity_menu:index == menuIndex}" @click="selectMenu(index,$event)">{{item.menus_name}}
-              <div class="menus-item-badge" v-if="menuFoodNum[index]">{{menuFoodNum[index]}}</div>
-            </div>
-          </div>
-        </div>
-        <!--食品列表-->
-        <div class="foodSwiper" ref="foodList">
-          <div class="lists">
-            <div class="item-box" v-for="menuitem in menusLists">
-              <div class="item">
-                <div class="menu border-bottom">
-                  <span class="title">{{menuitem.menus_name}}</span>
-                  <span>{{menuitem.menus_description}}</span>
+    <div>
+      <swiper :options="foodsCommit" ref="foodsSwiper">
+        <swiper-slide>
+          <div class="foodsList">
+            <!--商品 评价 滑动列表-->
+            <div class="shop-swiper-box">
+              <!--左侧商品导航-->
+              <div class="navSwiper" ref="menuList">
+                <div class="lists">
+                  <div v-for="(item,index) in menusLists" :key="index" class="item border-bottom"
+                       :class="{activity_menu:index == menuIndex}" @click="selectMenu(index,$event)">{{item.menus_name}}
+                    <div class="menus-item-badge" v-if="menuFoodNum[index]">{{menuFoodNum[index]}}</div>
+                  </div>
                 </div>
-                <div class="food-list" v-for="fooditem in menuitem.foods">
-                  <div class="food-item" @click="foodsDetail">
-                    <div class="food-item-img">
-                      <img src="https://fuss10.elemecdn.com/e/51/5386c593a0fe441cfb52215cdd431jpeg.jpeg" alt="">
-                    </div>
-                    <div class="food-item-info">
-                      <h2 class="ellipsis">{{fooditem.name}}</h2>
-                      <div class="des ellipsis">
-                        {{fooditem.description}}
+              </div>
+              <!--食品列表-->
+              <div class="foodSwiper" ref="foodList">
+                <div class="lists">
+                  <div class="item-box" v-for="menuitem in menusLists">
+                    <div class="item">
+                      <div class="menu border-bottom">
+                        <span class="title">{{menuitem.menus_name}}</span>
+                        <span>{{menuitem.menus_description}}</span>
                       </div>
-                      <div class="mouth-sale ellipsis">
-                        <span>月售{{fooditem.salenum}}份</span>
-                        <span>好评率{{fooditem.favorableRate}}%</span>
-                      </div>
-                      <div class="price">
+                      <div class="food-list" v-for="fooditem in menuitem.foods">
+                        <div class="food-item" @click="foodsDetail(fooditem.foods_id)">
+                          <div class="food-item-img">
+                            <img src="https://fuss10.elemecdn.com/e/51/5386c593a0fe441cfb52215cdd431jpeg.jpeg" alt="">
+                          </div>
+                          <div class="food-item-info">
+                            <h2 class="ellipsis">{{fooditem.name}}</h2>
+                            <div class="des ellipsis">
+                              {{fooditem.description}}
+                            </div>
+                            <div class="mouth-sale ellipsis">
+                              <span>月售{{fooditem.salenum}}份</span>
+                              <span>好评率{{fooditem.favorableRate}}%</span>
+                            </div>
+                            <div class="price">
                         <span class="price-sale">{{fooditem.price}}
                         </span>
-                        <add-cart :storeId="storeInfo._id" :foodsInfo="fooditem" v-on:addCartListen="addCartHandler" v-on:reduceCartListen="reduceCartHandler"></add-cart>
+                              <add-cart :storeId="storeInfo._id" :foodsInfo="fooditem" v-on:addCartListen="addCartHandler" v-on:reduceCartListen="reduceCartHandler"></add-cart>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -127,37 +122,135 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </swiper-slide>
+        <swiper-slide>
+          <!--评价列表-->
+          <div class="commit_box" ref="commit">
+            <div class="commit_wrap">
+              <div class="score_box">
+                <div class="total_score">
+                  <div class="score_1">{{storeInfo.score.total_score}}</div>
+                  <div class="score_2">综合评分</div>
+                  <div class="score_3">高于周边商家72.0%</div>
+                </div>
+                <div class="item_score border-left">
+                  <div class="service_score">
+                    <div class="score_label">服务态度</div>
+                    <div class="score-star">
+                      <div class="score-default"></div>
+                      <div class="score-active"></div>
+                    </div>
+                    <div class="score_num">{{storeInfo.score.service_score}}</div>
+                  </div>
+                  <div class="goods_score">
+                    <div class="score_label">商品评分</div>
+                    <div class="score-star">
+                      <div class="score-default"></div>
+                      <div class="score-active"></div>
+                    </div>
+                    <div class="score_num">{{storeInfo.score.goods_score}}</div>
+                  </div>
+                  <div class="time_score">
+                    <div class="score_label">送达时间</div>
+                    <div class="time">41分钟</div>
+                  </div>
+                </div>
+              </div>
+              <div class="commit_category_box">
+                <div class="lists border-bottom-dotted">
+                  <div class="item">全部(1259)</div>
+                  <div class="item">满意(1218)</div>
+                  <div class="item">不满意(39)</div>
+                  <div class="item">有图(4)</div>
+                  <div class="item">味道好(12)</div>
+                </div>
+                <div class="check_box">
+                  <div class="check_icon" id="check" @click="checkIconShow = !checkIconShow">
+                    <div class="check_icon_default" v-if="!checkIconShow"></div>
+                    <div class="check_icon_active" v-if="checkIconShow"></div>
+                  </div>
+                  <label for="check" class="check_label" @click="checkIconShow = !checkIconShow">只看有评价的内容</label>
+                </div>
+              </div>
+              <div class="commit_lists">
+                <div class="commit_item border-bottom">
+                  <div class="avater">
+                    <img src="https://fuss10.elemecdn.com/c/f5/d0b0f2fc83f3ac3e4a0cfae891256png.png?imageMogr/format/webp/thumbnail/!60x60r/gravity/Center/crop/60x60/" alt="">
+                  </div>
+                  <div class="commit_item_right">
+                    <div class="name_box">
+                      <span class="name">匿名用户</span>
+                      <span class="date">2017-12-21</span>
+                    </div>
+                    <div class="service_box">
+                      <div class="service_wrap">
+                        <label>商家服务：</label>
+                        <span class="score_icon"></span>
+                        <span>满意</span>
+                      </div>
+                      <div class="service_wrap goods_commit border-left">
+                        <label>商品：</label>
+                        <span class="score_icon"></span>
+                        <span>满意</span>
+                      </div>
+                    </div>
+                    <div class="commit_content">
+                      <div class="lists">
+                        <div class="item">
+                          <span class="goods_name">鸡公煲小煲:</span>
+                          <span class="text">商家太忙了</span>
+                        </div>
+                        <div class="item">
+                          <span class="goods_name">鸡公煲小煲:</span>
+                          <span class="text">商家太忙了</span>
+                        </div>
+                      </div>
+                      <div class="img_box">
+                        <img src="https://fuss10.elemecdn.com/f/cf/d0860d982b8db1797e5cb1d20eb32jpeg.jpeg?imageMogr/format/webp/thumbnail/!142x142r/gravity/Center/crop/142x142/" alt="">
+                        <img src="https://fuss10.elemecdn.com/f/cf/d0860d982b8db1797e5cb1d20eb32jpeg.jpeg?imageMogr/format/webp/thumbnail/!142x142r/gravity/Center/crop/142x142/" alt="">
+                        <img src="https://fuss10.elemecdn.com/f/cf/d0860d982b8db1797e5cb1d20eb32jpeg.jpeg?imageMogr/format/webp/thumbnail/!142x142r/gravity/Center/crop/142x142/" alt="">
+                        <img src="https://fuss10.elemecdn.com/f/cf/d0860d982b8db1797e5cb1d20eb32jpeg.jpeg?imageMogr/format/webp/thumbnail/!142x142r/gravity/Center/crop/142x142/" alt="">
+                        <img src="https://fuss10.elemecdn.com/f/cf/d0860d982b8db1797e5cb1d20eb32jpeg.jpeg?imageMogr/format/webp/thumbnail/!142x142r/gravity/Center/crop/142x142/" alt="">
+                        <img src="https://fuss10.elemecdn.com/f/cf/d0860d982b8db1797e5cb1d20eb32jpeg.jpeg?imageMogr/format/webp/thumbnail/!142x142r/gravity/Center/crop/142x142/" alt="">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </swiper-slide>
+      </swiper>
     </div>
 
     <!--底部购买商品结算列表-->
-    <div class="cart-box">
+    <transition name="cart">
+      <div class="cart-box" v-if="cartHide">
         <mt-popup v-model="cartListShow" position="bottom">
           <div class="cartList">
-              <div class="header">
-                <h1>已选商品</h1>
-                <div class="clear">
-                  <span class="clear-icon"></span>
-                  <span class="clear-text">清空</span>
-                </div>
+            <div class="header">
+              <h1>已选商品</h1>
+              <div class="clear">
+                <span class="clear-icon"></span>
+                <span class="clear-text">清空</span>
               </div>
-              <div class="select-goods-lists">
-                <div class="lists">
-                  <div v-for="cartFoodItem in cartDataLists">
-                    <div class="item" v-if="cartFoodItem.num">
-                      <span class="item-name ellipsis">{{cartFoodItem.foods.name}}</span>
-                      <span class="item-price">{{cartFoodItem.foods.price | currencyFilter}}</span>
-                      <add-cart :storeId="storeInfo._id" :foodsInfo="cartFoodItem.foods" v-on:addCartListen="addCartHandler" v-on:reduceCartListen="reduceCartHandler"></add-cart>
-                    </div>
+            </div>
+            <div class="select-goods-lists">
+              <div class="lists">
+                <div v-for="cartFoodItem in cartDataLists">
+                  <div class="item" v-if="cartFoodItem.num">
+                    <span class="item-name ellipsis">{{cartFoodItem.foods.name}}</span>
+                    <span class="item-price">{{cartFoodItem.foods.price | currencyFilter}}</span>
+                    <add-cart :storeId="storeInfo._id" :foodsInfo="cartFoodItem.foods" v-on:addCartListen="addCartHandler" v-on:reduceCartListen="reduceCartHandler"></add-cart>
                   </div>
                 </div>
               </div>
-              <div class="many-go">
-                <span>商品如需分开打包，请使用多人订餐</span>
-                <span class="right-icon"></span>
-              </div>
             </div>
+            <div class="many-go">
+              <span>商品如需分开打包，请使用多人订餐</span>
+              <span class="right-icon"></span>
+            </div>
+          </div>
         </mt-popup>
         <div class="cart-wrap">
           <div class="cart-wrap-show">
@@ -173,7 +266,7 @@
               <span v-if="totalFoodNum">还差 {{storeInfo.money_limit-totalPrice | currencyFilter}}</span>
               起送
             </div>
-            <div class="set-account" v-if="storeInfo.money_limit-totalPrice<=0" @click="">去结算</div>
+            <div class="set-account" v-if="storeInfo.money_limit-totalPrice<=0" @click="goToPay">去结算</div>
           </div>
         </div>
         <div class="cart-icon-box" @click="openCartLists">
@@ -185,6 +278,8 @@
           <div class="cart-goods-num" v-if="totalFoodNum">{{totalFoodNum}}</div>
         </div>
       </div>
+    </transition>
+
 
     <!--活动列表-->
     <div class="activity-hide-box">
@@ -209,67 +304,49 @@
     </div>
 
     <!--食品详情-->
-   <!-- <div class="detail_wrap">
-      <div class="foods_detail">
+    <div class="foods_detail">
+        <mt-popup v-model="foodsDetailShow" popup-transition="popup-fade">
+          <div class="detail_box">
+            <div class="detail_img">
+              <img src="https://fuss10.elemecdn.com/e/51/5386c593a0fe441cfb52215cdd431jpeg.jpeg" alt="">
+              <div class="cover_box">
+                <div class="share_box">
+                  <div class="share_icon"></div>
+                </div>
+                <div class="description">{{foodsDetailInfo.description}}</div>
+              </div>
+            </div>
+            <div class="detail_content">
+              <h2 class="title ellipsis">{{foodsDetailInfo.name}}</h2>
+              <div class="mouth_sale_box">
+                <span class="mouth_sale">月售{{foodsDetailInfo.salenum}}份</span>
+                <span class="favorate_rate">好评率{{foodsDetailInfo.favorableRate}}%</span>
+                <span class="findDetail">查看详情</span>
+              </div>
+              <div class="price_box">
+                <span class="price">34</span>
+                <span class="add_cart_btn">加入购物车</span>
+              </div>
+            </div>
+          </div>
+        </mt-popup>
       </div>
-      <mt-popup popup-transtion="popup-fade">
-        <div ref="detailBox" class="detail_box" @touchstart="detailStart($event)" @touchmove="detailMoveUp($event)">
 
-          <div class="detail_img">
-            <img src="https://fuss10.elemecdn.com/e/51/5386c593a0fe441cfb52215cdd431jpeg.jpeg" alt="">
-            <div class="cover_box">
-              <div class="share_box">
-                <div class="share_icon"></div>
-              </div>
-              <div class="description">大颗肉粒搭配浓郁酱汁、加入意大利进口特级初榨橄榄油</div>
-            </div>
+    <!--点击添加购物车的动画-->
+    <div ref="ball">
+      <div v-for="ball in balls">
+        <transition @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
+          <div class="ball" v-show="ball.show">
+            <div class="inner inner-hook">1</div>
           </div>
-          <div class="detail_content">
-            <h2 class="title ellipsis">经典意式肉酱面</h2>
-            <div class="mouth_sale_box">
-              <span class="mouth_sale">月售97份</span>
-              <span class="favorate_rate">好评率95%</span>
-            </div>
-            <div class="price_box">
-              <span class="price">34</span>
-              <span class="add_cart_btn">加入购物车</span>
-            </div>
-          </div>
-        </div>
-      </mt-popup>
-    </div>-->
-
-
-    <div class="foods_detail" ref="detailBox">
-      <mt-popup v-model="foodsDetailShow" popup-transition="popup-fade">
-        <div class="detail_box" @touchstart="detailStart($event)" @touchmove="detailMoveUp($event)">
-
-          <div class="detail_img">
-            <img src="https://fuss10.elemecdn.com/e/51/5386c593a0fe441cfb52215cdd431jpeg.jpeg" alt="">
-            <div class="cover_box">
-              <div class="share_box">
-                <div class="share_icon"></div>
-              </div>
-              <div class="description">大颗肉粒搭配浓郁酱汁、加入意大利进口特级初榨橄榄油</div>
-            </div>
-          </div>
-          <div class="detail_content">
-            <h2 class="title ellipsis">经典意式肉酱面</h2>
-            <div class="mouth_sale_box">
-              <span class="mouth_sale">月售97份</span>
-              <span class="favorate_rate">好评率95%</span>
-            </div>
-            <div class="price_box">
-              <span class="price">34</span>
-              <span class="add_cart_btn">加入购物车</span>
-            </div>
-          </div>
-        </div>
-      </mt-popup>
+        </transition>
+      </div>
     </div>
+
   </div>
 </template>
 <script>
+  let that = null;
   import {opacity} from '../../animate/animate'
   import BetterScroll from 'better-scroll'
   import axios from 'axios'
@@ -279,11 +356,24 @@
     name: "shop",
     data() {
       return {
+        foodsCommit:{
+          resistanceRatio:0,
+          passiveListeners : false,
+          noSwiping : true,
+          on:{
+            slideChange(){//监听slide滑动，改变商品和价格的样式
+              that.isActive = that.foodsSwiperOb.activeIndex === 0?true:false
+              that.cartHide = that.foodsSwiperOb.activeIndex === 0?true:false;
+            }
+          }
+        },
+        checkIconShow:true,//check的切换（只查看有内容的评价）
         balls:[
           {show:false}
         ],
         dropBalls:[],
-        detailTouchY:0,
+        cartHide:true,//切换商品和评价隐藏底部购物车
+        foodsDetailInfo:{},//点击打开食品详情时的食品信息
         foodsDetailShow:false,//食品详情显示切换
         cartListShow:false,//底部购物车列表显示隐藏
         activityShow:false,//页面下部----活动列表的显示隐藏
@@ -301,6 +391,7 @@
         foodListHeight: [],//商品列表中每个item-box的高度
         foodscroll: null,//商品列表的betterscroll
         menuscroll: null,//menu导航的betterscroll
+        commit: null,//commit导航的betterscroll
         isActive: true,//导航被选中的状态
         bgUrl: '',//header部分背景地址
         storeInfo: {},//商家信息
@@ -313,6 +404,9 @@
     },
     computed: {
       ...mapState(['cartLists']),
+      foodsSwiperOb(){
+        return this.$refs.foodsSwiper.swiper;
+      },
       storeId(){
         return this.$route.query.store_id;
       },
@@ -365,6 +459,7 @@
             let store = resdata.store;//商家所有信息
             this.menusLists = this.initMenuFoods(store);//商品和导航列表
             this.storeInfo = store;//商家所有信息
+            console.log(store)
             this.initMenuFoodNum();
             //this.menusLists = store.foods_lists;//导航列表（包含食品列表）
 //            console.log(this.menusLists)
@@ -394,7 +489,7 @@
         return menus_lists;
       },
 //      获取商品列表每一项的高度
-      getFoodListHeight() {
+      getFoodsListItemHeight() {
         let foodListChild = this.$refs.foodList.children[0].children;
         Array.prototype.slice.call(foodListChild).forEach((item, index) => {
           this.foodListHeight[index] = item.offsetTop
@@ -435,7 +530,14 @@
         });
         this.menuscroll.on('scroll', (position) => {
 //            this.scrollY = Math.abs(Math.round(position.y));
-        })
+        });
+
+        this.commit = new BetterScroll(this.$refs.commit, {
+          click: true
+        });
+        this.commit.on('scroll', (position) => {
+//            this.scrollY = Math.abs(Math.round(position.y));
+        });
       },
 //        导航选择
       selectMenu(index, ev) {
@@ -468,30 +570,36 @@
         })
         this.menuFoodNum = arr;
       },
-
 //      食品详情
-      foodsDetail(){
+      foodsDetail(foodId){
         this.foodsDetailShow = true;
+        this.menusLists.forEach((item)=>{
+          item.foods.forEach((food)=>{
+            if(food.foods_id === foodId){
+              console.log(food)
+              this.foodsDetailInfo = food;
+            }
+          })
+        })
       },
-
-      detailStart(ev){
-        console.log(ev)
-        this.detailTouchY = ev.changedTouches[0].clientY;
+      // 设置商品列表的高度
+      getFoodsListHeight(){
+        let h = window.innerHeight-this.$refs.header.offsetHeight;
+        this.$refs.menuList.style.height = h + 'px';
+        this.$refs.foodList.style.height = h + 'px';
+        this.$refs.commit.style.height = h + 'px';
       },
-      detailMoveUp(ev){
+      // 切换商品和评价
+      swiperTab(swiperIndex){
+        this.foodsSwiperOb.slideTo(swiperIndex,200,false);
+        this.isActive = swiperIndex === 0?true:false;
+        this.cartHide = swiperIndex === 0?true:false;
+      },
+      // 结算
+      goToPay(){
+        let storeId = this.storeInfo._id;
 
-
-        ev.preventDefault();
-        let y = ev.changedTouches[0].clientY;
-        let dis = this.detailTouchY - y;
-        let moveElement = this.$refs.detailBox;
-        if(dis>0){
-          let w = dis/5+80;
-          dis = -dis+120;
-          console.log(w)
-          moveElement.style.transform = `translate3d(0,${dis}px,0)`;
-          moveElement.style.width = w+'%';
-        }
+        this.$router.push({path:'pay',query:{storeId:storeId}})
       },
 
 //      监听子组件(addCart)添加购物车的动作
@@ -594,10 +702,11 @@
     },
     mounted() {
       this.init();
-      console.log(this.cartDataLists)
+      that = this;//把vue实例指向that（swiper滑动时用到，解决swiper指向问题）
       this.$nextTick(() => {
         setTimeout(() => {
-          this.getFoodListHeight()
+          this.getFoodsListHeight();
+          this.getFoodsListItemHeight();
         }, 100)
       })
     },
@@ -835,8 +944,6 @@
         }
         .isActive {
           color: $color-primay;
-        }
-        .underline {
           border-bottom: 2px solid $color-primay;
         }
       }
@@ -981,6 +1088,218 @@
       }
     }
 
+    /*评价列表*/
+    .commit_box{
+      .commit_wrap{
+        .score_box{
+          background: $background-fff;
+          padding: 0.5rem;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          .total_score{
+            padding: 0 1rem;
+            text-align: center;
+            .score_1{
+              font-size: $font-size-1-0;
+              font-weight: bold;
+              color: $color-price;
+            }
+            .score_2{
+              font-size: $font-size-0-4-5;
+              color: $color-666;
+            }
+            .score_3{
+              margin-top: 0.3rem;
+              font-size: $font-size-0-4-5;
+              color: $color-999;
+            }
+          }
+          .item_score{
+            padding: 0 0.5rem;
+            flex: 1;
+            .service_score,.goods_score,.time_score{
+              display: flex;
+              flex-direction: row;
+              align-items: baseline;
+            }
+            .goods_score{
+              margin: 0.2rem 0;
+            }
+            .score_label{
+              font-size: 0.55rem;
+              color: $color-666;
+              margin-right: 0.5rem;
+            }
+            .score-star{
+              position: relative;
+              font-size: 0;
+              width: 3rem;
+              .score-default{
+                width: 100%;
+                height: 0.5rem;
+                background: url("../../images/star-defalut.png") no-repeat;
+                background-size: cover;
+              }
+              .score-active{
+                width: 50%;
+                overflow: hidden;
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 0.5rem;
+                background: url("../../images/star-active.png") no-repeat;
+                background-size: cover;
+              }
+            }
+            .score_num{
+              font-size: 0.55rem;
+              color: $color-price;
+              margin-left: 0.3rem;
+            }
+            .time{
+              font-size: 0.55rem;
+              color: $color-999;
+            }
+          }
+        }
+
+        .commit_category_box{
+          margin-top: 0.3rem;
+          padding: 0.5rem;
+          background: $background-fff;
+          .lists{
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            .item{
+              margin-right: 0.5rem;
+              margin-bottom: 0.4rem;
+              padding: 0.2rem 0.5rem;
+              color: $color-fff;
+              background: $background-primay;
+              font-size: $font-size-0-5;
+              border-radius: 2px;
+            }
+          }
+          .check_box{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-top: 0.5rem;
+            .check_icon{
+              width: 0.6rem;
+              height: 0.6rem;
+              margin-right: 0.2rem;
+              .check_icon_default{
+                width: 100%;
+                height: 100%;
+                background: url("../../images/check-icon-default.png");
+                background-size: contain;
+              }
+              .check_icon_active{
+                width: 100%;
+                height: 100%;
+                background: url("../../images/check-icon-active.png");
+                background-size: contain;
+              }
+            }
+            .check_label{
+              font-size: $font-size-0-5;
+              color: $color-666;
+            }
+          }
+        }
+        .commit_lists{
+          margin-top: 0.3rem;
+          background: $background-fff;
+          .commit_item{
+            display: flex;
+            flex-direction: row;
+            padding: 0.5rem;
+            .avater{
+              width: 2rem;
+              height: 2rem;
+              img{
+                width: 2rem;
+                height: 2rem;
+              }
+            }
+            .commit_item_right{
+              flex: 1;
+              margin-left: 0.5rem;
+              .name_box{
+                display: flex;
+                flex-direction: row;
+                align-items: baseline;
+                .name{
+                  margin-right: 0.5rem;
+                  font-size: $font-size-0-6;
+                  color: $color-333;
+                }
+                .date{
+                  font-size: $font-size-0-5;
+                  color: $color-999;
+                }
+              }
+              .service_box{
+                display: flex;
+                flex-direction: row;
+                .service_wrap{
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  label{
+                    font-size: $font-size-0-5;
+                    color: $color-666;
+                  }
+                  .score_icon{
+                    width: 0.5rem;
+                    height: 0.5rem;
+                    margin-right: 0.1rem;
+                    background: url("../../images/score-icon-1.png") no-repeat;
+                    background-size: contain;
+                  }
+                  span{
+                    font-size: $font-size-0-5;
+                    color: $color-satisfy;
+                  }
+                }
+                .goods_commit{
+                  padding-left: 0.3rem;
+                  margin-left: 0.3rem;
+                }
+              }
+              .commit_content{
+                padding-top: 0.3rem;
+                font-size: $font-size-0-5;
+                color: $color-666;
+                .lists{
+                  .item{
+                    margin-bottom: 0.3rem;
+                    .goods_name{
+                      color: $color-primay;
+                    }
+                    .text{
+                      color: $color-333;
+                    }
+                  }
+                }
+                .img_box{
+                  img{
+                    width: 3.8rem;
+                    height: 3.8rem;
+                    margin-right: 0.1rem;
+                    margin-bottom: 0.15rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 
     /*底部购物车数量显示*/
     .cart-box{
@@ -1235,95 +1554,103 @@
 
     /*食品详情 popup*/
     .foods_detail{
-      width: 80%;
+      width: 100%;
       .mint-popup{
         width: 80%;
-        .detail_box{
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .detail_box{
+        width: 100%;
+        background: $background-fff;
+        .detail_img{
+          position: relative;
           width: 100%;
-          background: $background-fff;
-          .detail_img{
-            position: relative;
+          overflow: hidden;
+          img{
             width: 100%;
-            max-height: 15rem;
-            overflow: hidden;
-            img{
-              width: 100%;
-            }
-            .cover_box{
+          }
+          .cover_box{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0px -30px 80px #333 inset;
+            .share_box{
               position: absolute;
-              top: 0;
+              top: 0.5rem;
+              right: 0.5rem;
+              padding: 0.2rem;
+              border-radius: 50%;
+              background: $background-777;
+              .share_icon{
+                width: 0.9rem;
+                height: 0.9rem;
+                background: url("../../images/share_icon.png") no-repeat;
+                background-size: contain;
+              }
+            }
+            .description{
+              position: absolute;
+              bottom: 0;
               left: 0;
-              width: 100%;
-              height: 100%;
-              box-shadow: 0px -30px 80px #333 inset;
-              .share_box{
-                position: absolute;
-                top: 0.5rem;
-                right: 0.5rem;
-                padding: 0.2rem;
-                border-radius: 50%;
-                background: $background-777;
-                .share_icon{
-                  width: 0.9rem;
-                  height: 0.9rem;
-                  background: url("../../images/share_icon.png") no-repeat;
-                  background-size: contain;
-                }
-              }
-              .description{
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                padding: 0.5rem;
-                color: $color-ddd;
-                font-size: $font-size-0-5;
-              }
+              padding: 0.5rem;
+              color: $color-ddd;
+              font-size: $font-size-0-5;
             }
           }
-          .detail_content{
-            padding: 0.5rem;
-            padding-top: 0.8rem;
-            .title{
-              background-size: contain;
-              font-size: $font-size-0-6;
-              font-weight: bold;
-              color: $color-333;
+        }
+        .detail_content{
+          padding: 0.5rem;
+          .title{
+            background-size: contain;
+            font-size: $font-size-0-6;
+            font-weight: bold;
+            color: $color-333;
+          }
+          .mouth_sale_box{
+            display: flex;
+            flex-direction: row;
+            margin-top: 0.2rem;
+            .mouth_sale{
+              font-size: $font-size-0-4-5;
+              color: $color-666;
+              margin-right: 0.2rem;
             }
-            .mouth_sale_box{
-              .mouth_sale{
-                font-size: $font-size-0-4-5;
-                color: $color-666;
-              }
-              .favorate_rate{
-                font-size: $font-size-0-4-5;
-                color: $color-666;
-              }
+            .favorate_rate{
+              font-size: $font-size-0-4-5;
+              color: $color-666;
             }
-            .price_box{
-              margin-top: 1rem;
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-              .price{
-                color: $color-price;
-              }
-              .add_cart_btn{
-                width: 3.5rem;
-                height: 1.2rem;
-                text-align: center;
-                line-height: 1.2rem;
-                font-size: $font-size-0-5;
-                color: $color-fff;
-                background: $background-primay;
-                border-radius: 0.6rem;
-              }
+            .findDetail{
+              flex: 1;
+              text-align: right;
+              font-size: $font-size-0-4-5;
+              color: $color-666;
+            }
+          }
+          .price_box{
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            .price{
+              color: $color-price;
+            }
+            .add_cart_btn{
+              width: 3.5rem;
+              height: 1.2rem;
+              text-align: center;
+              line-height: 1.2rem;
+              font-size: $font-size-0-5;
+              color: $color-fff;
+              background: $background-primay;
+              border-radius: 0.6rem;
             }
           }
         }
       }
     }
-
-
 
     .ball {
       position: fixed; //小球动画必须脱离html布局流
@@ -1363,6 +1690,23 @@
     }
     .cartlists-popup-enter-to{
       height: 5rem;
+    }
+
+    /*定义底部购物车离开和进入的动画*/
+    .cart-enter-active{
+      transition: all 0.5s;
+    }
+    .cart-enter{
+      transform: translateY(2.3rem);
+    }
+    .cart-enter-to{
+      transform: translateY(0);
+    }
+    .cart-leave-active{
+      transition: all 0.5s;
+    }
+    .cart-leave-to{
+      transform: translateY(2.3rem);
     }
     /*定义底部购物车动画*/
     @keyframes cart-icon-animate {
