@@ -8,6 +8,7 @@ import Profile from '@/page/profile/profile'
 
 import Shop from '@/page/shop/shop'
 import Pay from '@/page/pay/pay'
+import Category from '@/page/category/category'
 
 Vue.use(Router)
 
@@ -44,6 +45,11 @@ export default new Router({
       path:'/pay',
       name:'pay',
       component:Pay
+    },
+    {
+      path:'/category',
+      name:'category',
+      component:Category
     }
   ]
 })

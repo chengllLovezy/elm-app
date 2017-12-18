@@ -15,7 +15,5 @@
     }
 </script>
 <style lang="scss">
-.mint-tabbar{
-  position: fixed;
-}
+
 </style>

@@ -1,0 +1,15 @@
+<template>
+    <div class="category">
+      <h1>1111</h1>
+    </div>
+</template>
+
+<script>
+    export default {
+        name: "category"
+    }
+</script>
+
+<style scoped>
+
+</style>

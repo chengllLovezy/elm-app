@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-      <div class="header">
+      <div class="header" ref="searchBox">
         <div class="address-wrap">
           <div class="address-box">
             <span class="address-icon"></span>
@@ -10,10 +10,15 @@
           <div class="weather-box">天气</div>
         </div>
         <!--搜索商品-->
-        <div class="search-wrap">
-          <span class="search-icon"></span>
-          <span class="search-text">搜索商家、商品名称</span>
+        <div class="search-hide">
+          <div class="search-box">
+            <div class="search-wrap">
+              <span class="search-icon"></span>
+              <span class="search-text">搜索商家、商品名称</span>
+            </div>
+          </div>
         </div>
+
         <!--搜索热词-->
         <div class="search-hot">
           <a href="javascript:;">豆花</a>
@@ -27,25 +32,28 @@
 
       <!--食品分类导航-->
       <div class="nav">
-        <mt-swipe :auto="0" :continuous="false">
-          <mt-swipe-item v-for="item in categorys">
-            <div class="food-nav-list">
+        <swiper :options="navSwiperOption" ref="navSwiper">
+          <swiper-slide v-for="item in categorys">
+            <div class="food-nav-list" @click="goCategory">
               <div class="food-nav-item" v-for="i in item">
                 <img :src="baseImgUrl+i.imgUrl" alt="">
                 <p>{{i.text}}</p>
               </div>
             </div>
-          </mt-swipe-item>
-        </mt-swipe>
+          </swiper-slide>
+        </swiper>
+        <div class="navSwiper-pagination"></div>
       </div>
 
       <!--广告banner-->
       <div class="ads">
-        <mt-swipe>
-          <mt-swipe-item v-for="item in ads">
+        <swiper :options="adsSwiperOption" ref="adsSwiper">
+          <swiper-slide v-for="item in ads">
             <img :src="'static/'+item.imgSrc" alt="">
-          </mt-swipe-item>
-        </mt-swipe>
+          </swiper-slide>
+
+        </swiper>
+        <div class="adsSwiper-pagination"></div>
       </div>
 
       <!--热卖推荐-->
@@ -84,7 +92,22 @@
 
       <!--商家列表-->
       <div class="seller">
-        <h2 class="seller-title ellipsis">{{sellerListsTitle}}</h2>
+        <h2 class="seller-title ellipsis">推荐商家</h2>
+        <div class="opare-box" ref="opareBox">
+          <div class="opare border-bottom">
+            <div class="sort" @click="sortPopupHandler">
+              <span class="label ellipsis">{{sortText}}</span>
+              <span class="down-icon"></span>
+            </div>
+            <div class="favorite">好评优先</div>
+            <div class="distance">距离最近</div>
+            <div class="filter">
+              <span class="label">筛选</span>
+              <span class="filter-icon"></span>
+            </div>
+          </div>
+        </div>
+        <!--<seller :sellerInfo="seller" :activityInfo="activity"></seller>-->
         <div class="seller-item border-bottom" v-for="item in seller" @click="goShop(item._id)">
           <div class="avater">
             <img :src="baseImgUrl+item.head_img" alt="">
@@ -147,23 +170,70 @@
         </div>
       </div>
 
+      <div class="sort-popup">
+        <mt-popup v-model="sortPopupShow" position="top">
+          <div class="sort-lists">
+            <div class="item" v-for="(sortItem,index) in sortData" :key="index" @click="sortSelectedHandler(index)">
+              <span class="label" :class="{selected:sortItem.selected}">{{sortItem.label}}</span>
+              <span class="select-icon" v-if="sortItem.selected"></span>
+            </div>
+          </div>
+        </mt-popup>
+      </div>
     </div>
 </template>
 <script>
-
+// import seller from '../../components/seller/seller'
 import axios from 'axios'
     export default {
       name:'home',
       data(){
         return {
-          sellerListsTitle:'推荐商家',
+          cancelScroll:false,
+          sortPopupShow:false,//综合排序点击popup
+          sortText:'综合排序',
+          sortData:[
+            {label:'综合排序',selected:true},
+            {label:'销量最高',selected:false},
+            {label:'起送价最低',selected:false},
+            {label:'配送最快',selected:false},
+            {label:'配送费最低',selected:false},
+            {label:'人均从低到高',selected:false},
+            {label:'人均从高到低',selected:false}
+          ],
           seller:{},
           activity:[],
+          adsSwiperOption:{
+            loop:true,
+            autoplay:true,
+            init:false,//在update钩子中初始化
+            pagination:{
+              el: '.adsSwiper-pagination'
+            }
+          },
+          navSwiperOption:{
+            resistanceRatio:0,//边缘抵抗率
+            init:false,//在update钩子中初始化
+            pagination:{
+              el: '.navSwiper-pagination'
+            }
+          },
           qualityOption:{},
           ads:[],
           hotRecommend:[],
           categorys:[],//导航食品分类数据集合
           baseImgUrl:'https://fuss10.elemecdn.com'//导航食品分类图片域名地址
+        }
+      },
+      components:{
+        // seller
+      },
+      computed:{
+        adsSwiper(){
+          return this.$refs.adsSwiper.swiper;
+        },
+        navSwiper(){
+          return this.$refs.navSwiper.swiper;
         }
       },
       methods:{
@@ -191,16 +261,80 @@ import axios from 'axios'
             this.qualityOption = appdata.quality_option;
             //初始化商家列表的数据
             this.seller = store;
+            console.log(this.seller)
             this.activity = appdata.activity_style;
           });
         },
+        // 进入导航分类页
+        goCategory(){
+          this.$router.push('category')
+        },
 //        点击  进入购物页面，即商家详情页
         goShop(store_id){
+          this.cancelScroll = true;
           this.$router.push({path:'shop',query: { store_id: store_id }})
+        },
+        // 监听滚动条事件
+        scrollHandler(){
+          if(this.cancelScroll){
+            return;
+          }
+          let scrollTop =  window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+          let searchBox = this.$refs.searchBox;
+          let address = searchBox.getElementsByClassName('address-wrap')[0];
+          let search = searchBox.getElementsByClassName('search-box')[0];
+          let h = address.offsetHeight;
+
+          let opareBox = this.$refs.opareBox;
+          let opare = opareBox.getElementsByClassName('opare')[0];
+          let top = opareBox.offsetTop - search.offsetHeight;
+          //顶部搜索定位控制
+          if(scrollTop>=h){
+            search.style.position = 'fixed';
+          }else{
+            search.style.position = 'absolute';
+          }
+          //商家筛选排序 定位控制
+          if(scrollTop>=top){
+            opare.style.position = 'fixed';
+            opare.style.top = '2.5rem';
+          }else{
+            opare.style.position = 'absolute';
+            opare.style.top = '0';
+          }
+        },
+        // 综合排序点击popup
+        sortPopupHandler(){
+          let searchBox = this.$refs.searchBox;
+          let search = searchBox.getElementsByClassName('search-box')[0];
+          let opareBox = this.$refs.opareBox;
+          let opare = opareBox.getElementsByClassName('opare')[0];
+          let top = opareBox.offsetTop - search.offsetHeight
+          window.scrollTo(0,top);
+          this.sortPopupShow = !this.sortPopupShow;
+        },
+        // 综合排序点击切换
+        sortSelectedHandler(i){
+          this.sortData.forEach((item,index)=>{
+            if(index === i){
+              item.selected = true;
+              this.sortText = item.label;
+            }else{
+              this.sortPopupShow = false;
+              item.selected = false
+            }
+          });
         }
+      },
+      updated() {
+        this.adsSwiper.init();
+        this.navSwiper.init();
       },
       mounted(){
         this.init();
+        this.$nextTick(()=>{
+          window.addEventListener('scroll',this.scrollHandler,false);
+        })
       }
     }
 </script>
@@ -212,11 +346,12 @@ import axios from 'axios'
 
     .header{
       background: $background-primay;
-      padding: 0.5rem;
       /*地址*/
       .address-wrap{
         font-size: $font-size-0-3;
         color: $color-fff;
+        padding: 0 0.5rem;
+        padding-top: 0.5rem;
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
@@ -252,33 +387,50 @@ import axios from 'axios'
         }
       }
       /*搜索框*/
-      .search-wrap{
-        height: 1.6rem;
-        margin: 0.5rem 0;
-        background: $background-fff;
-        border-radius: 2px;
-        color: $color-bbb;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
+      .search-hide{
+        position: relative;
+        width: 100%;
+        height: 2.5rem;
+        .search-box{
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 5000;
+          width: 100%;
+          padding: 0.5rem;
+          background: $background-primay;
 
-        .search-icon{
-          width: 0.7rem;
-          height: 0.7rem;
-          background: url("../../images/search-icon.png") no-repeat;
-          background-size: contain;
-          margin-right: 0.1rem;
-        }
-        .search-text{
-          font-size: $font-size-0-6;
-          font-family: '宋体';
+          .search-wrap{
+            height: 1.6rem;
+            background: $background-fff;
+            border-radius: 2px;
+            color: $color-bbb;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+
+            .search-icon{
+              width: 0.7rem;
+              height: 0.7rem;
+              background: url("../../images/search-icon.png") no-repeat;
+              background-size: contain;
+              margin-right: 0.1rem;
+            }
+            .search-text{
+              font-size: $font-size-0-6;
+              font-family: '宋体';
+            }
+          }
         }
       }
+
+
       /*搜搜热词*/
       .search-hot{
         font-size: $font-size-0-5;
-        padding: 0 0.2rem;
+        padding: 0 0.5rem;
+        padding-bottom: 0.5rem;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -290,8 +442,30 @@ import axios from 'axios'
 
     /*食品分类导航*/
     .nav{
-      height: 7.5rem;
+      position: relative;
+      height: 7.8rem;
       background: $background-fff;
+
+      .navSwiper-pagination{
+        position: absolute;
+        bottom: 0.6rem;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        margin: auto;
+        text-align: center;
+        .swiper-pagination-bullet{
+          width: 0.5rem;
+          height: 0.1rem;
+          margin: 0 0.2rem;
+          border-radius: 0!important;
+          background: $background-b4;
+          opacity: 0.6;
+        }
+        .swiper-pagination-bullet-active{
+          opacity: 1;
+        }
+      }
 
       .food-nav-list{
         display: flex;
@@ -313,7 +487,7 @@ import axios from 'axios'
         }
       }
 
-      .mint-swipe-indicator{
+      /*.mint-swipe-indicator{
         width: 0.5rem;
         height: 0.1rem;
         background: $background-ddd;
@@ -322,17 +496,39 @@ import axios from 'axios'
       }
       .mint-swipe-indicator.is-active{
         background: $background-d4;
-      }
+      }*/
     }
 
     /*adsBanner*/
     .ads{
-      height: 4.2rem;
+      position: relative;
+      height: 3.8rem;
       padding: 0 0.5rem;
       background: $background-fff;
-
+      .swiper-container{
+        width: 100%!important;
+      }
       img{
         width: 100%;
+      }
+      .adsSwiper-pagination{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        margin: auto;
+        text-align: center;
+        .swiper-pagination-bullet{
+          width: 0.5rem;
+          height: 0.1rem;
+          margin: 0 0.2rem;
+          border-radius: 0!important;
+          background: $background-b4;
+        }
+        .swiper-pagination-bullet-active{
+          background: $background-fff;
+        }
       }
       .mint-swipe-indicators{
         .mint-swipe-indicator{
@@ -351,6 +547,7 @@ import axios from 'axios'
     /*hot-recommend*/
     .hot-recommend{
       padding: 0.1rem 0.5rem;
+      padding-top: 0.4rem;
       background: $background-fff;
 
       .recommend-item{
@@ -494,175 +691,265 @@ import axios from 'axios'
     /*商家列表*/
     .seller{
       background: $background-fff;
-      margin-top: 0.5rem;
-      padding: 0.8rem 0;
+      /*margin-top: 0.5rem;
+      padding: 0.8rem 0;*/
 
       .seller-title{
         padding: 0 0.5rem;
         font-size: $font-size-0-7;
         font-weight: bold;
       }
-      /*商家列表item*/
-      .seller-item{
-        display: flex;
-        flex-direction: row;
-        /*border-bottom: 1px solid $color-ccc;*/
-        padding: 0.8rem 0.5rem;
-        /*头像*/
-        .avater{
-          img{
-            width: 3rem;
-            height: 3rem;
-            border: 1px solid $color-eee;
-          }
-        }
-        /*主要内容*/
-        .main{
+
+      .opare-box{
+        width: 100%;
+        height: 2rem;
+        position: relative;
+        z-index: 4000;
+        .opare{
+          position: absolute;
+          left: 0;
+          top: 0;
           width: 100%;
-          margin-left: 0.4rem;
-          /*商家name*/
-          .title{
-            /*margin-bottom: 0.1rem;*/
+          height: 2rem;
+          background: $background-fff;
+          padding: 0 0.5rem;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          font-size: $font-size-0-6;
+          color: $color-666;
+          .sort{
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
-            h2{
-              max-width: 80%;
-              font-size: $font-size-0-7;
-              font-weight: 700;
-              align-items: center;
-              .icon-brand{
-                display: inline-block;
-                padding: 0.1rem;
-                font-size: 0.25rem;
-                font-weight: 700;
-                transform: scale(0.9);
-                transform-origin: 0 0;
-                color: $color-6f3f15;
-                background: linear-gradient(-139deg,#fff100,#ffe339);
-              }
-            }
-            ul{
-              display: flex;
-              flex-direction: row;
-              li{
-                margin-left: 0.5rem;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                span{
-                  width: 0.8rem;
-                  height: 0.8rem;
-                  font-size: $font-size-0-3;
-                  color: $color-999;
-                }
-              }
-            }
-          }
-          /*商家评分*/
-          .rate{
-            margin-bottom: 0.2rem;
-            font-size: $font-size-0-5;
-            color: $color-666;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
             align-items: center;
-
-            .rate-info{
-              .rate-star{
-                display: inline-block;
-                position: relative;
-
-                .rate-active{
-                  width: 50%;
-                  overflow: hidden;
-                  position: absolute;
-                  top: 0;
-                  left: 0;
-                  z-index: 2;
-                }
-              }
-
-              .rate-score{
-                margin-left: 0.3rem;
-                margin-right: 0.3rem;
-              }
+            justify-content: flex-start;
+            .label{
+              width: 2.6rem;
+              font-size: $font-size-0-6;
+              color: $color-333;
+              font-weight: bold;
             }
-            .rate-icon{
-              .rate-za{
-                width: 2rem;
-                height: 0.6rem;
-                background: url("../../images/za.jpg") no-repeat;
-                background-size: contain;
-              }
+            .down-icon{
+              width: 0.5rem;
+              height: 1rem;
+              margin-left: 0.2rem;
+              background: url("../../images/down-icon-01.png") no-repeat;
+              background-size: contain;
             }
           }
-          /*商家配送*/
-          .moneylimit{
-            font-size: $font-size-0-4-5;
-            color: $color-666;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            padding-bottom: 0.3rem;
-
-            .after-line:after{
-              content: '|';
-              color: $color-ddd;
-              margin: 0 0.1rem 0 0.2rem;
-            }
+          .favorite,.distance{
+            text-align: center;
+            width: 25%;
           }
-
-          /*商家活动展示部分*/
-          .activity{
-            padding-bottom: 0.5rem;
+          .filter{
+            text-align: center;
             display: flex;
             flex-direction: row;
-            font-size: $font-size-0-5;
-            /*列表展示*/
-            .avtive-lists{
-              width: 70%;
-              .item{
-                margin-top: 0.3rem;
-                .item-icon{
-                  padding: 0.1rem;
-                  color: $color-fff;
-                  border-radius: 2px;
-                }
-                .text{
-                  color: $color-666;
-                }
-              }
+            justify-content: flex-end;
+            align-items: center;
+            .label{
+              font-size: $font-size-0-6;
+              color: $color-666;
             }
-            /*活动数量*/
-            .active-num{
-              width: 30%;
-              padding-top: 0.3rem;
-              color: $color-999;
-              font-size: $font-size-0-4-5;
-              text-align: right;
-              display: flex;
-              flex-direction: row;
-              justify-content: flex-end;
-              .active-down{
-                display: inline-block;
-                width: 0.3rem;
-                height: 0.15rem;
-                margin-top: 0.25rem;
-                margin-left: 0.15rem;
-                background: url("../../images/active-down.png") no-repeat;
-                background-size: contain;
-              }
+            .filter-icon{
+              width: 0.55rem;
+              height: 0.55rem;
+              margin-left: 0.2rem;
+              background: url("../../images/filter-icon.jpg") no-repeat;
+              background-size: contain;
             }
           }
         }
       }
+      /*商家列表item*/
+      .seller-item{
+         display: flex;
+         flex-direction: row;
+         /*border-bottom: 1px solid $color-ccc;*/
+         padding: 0.8rem 0.5rem;
+         /*头像*/
+         .avater{
+           img{
+             width: 3rem;
+             height: 3rem;
+             border: 1px solid $color-eee;
+           }
+         }
+         /*主要内容*/
+         .main{
+           width: 100%;
+           margin-left: 0.4rem;
+           /*商家name*/
+           .title{
+             /*margin-bottom: 0.1rem;*/
+             display: flex;
+             flex-direction: row;
+             justify-content: space-between;
+             h2{
+               max-width: 80%;
+               font-size: $font-size-0-7;
+               font-weight: 700;
+               align-items: center;
+               .icon-brand{
+                 display: inline-block;
+                 padding: 0.1rem;
+                 font-size: 0.25rem;
+                 font-weight: 700;
+                 transform: scale(0.9);
+                 transform-origin: 0 0;
+                 color: $color-6f3f15;
+                 background: linear-gradient(-139deg,#fff100,#ffe339);
+               }
+             }
+             ul{
+               display: flex;
+               flex-direction: row;
+               li{
+                 margin-left: 0.5rem;
+                 display: flex;
+                 flex-direction: column;
+                 justify-content: center;
+                 span{
+                   width: 0.8rem;
+                   height: 0.8rem;
+                   font-size: $font-size-0-3;
+                   color: $color-999;
+                 }
+               }
+             }
+           }
+           /*商家评分*/
+           .rate{
+             margin-bottom: 0.2rem;
+             font-size: $font-size-0-5;
+             color: $color-666;
+             display: flex;
+             flex-direction: row;
+             justify-content: space-between;
+             align-items: center;
+
+             .rate-info{
+               .rate-star{
+                 display: inline-block;
+                 position: relative;
+
+                 .rate-active{
+                   width: 50%;
+                   overflow: hidden;
+                   position: absolute;
+                   top: 0;
+                   left: 0;
+                   z-index: 2;
+                 }
+               }
+
+               .rate-score{
+                 margin-left: 0.3rem;
+                 margin-right: 0.3rem;
+               }
+             }
+             .rate-icon{
+               .rate-za{
+                 width: 2rem;
+                 height: 0.6rem;
+                 background: url("../../images/za.jpg") no-repeat;
+                 background-size: contain;
+               }
+             }
+           }
+           /*商家配送*/
+           .moneylimit{
+             font-size: $font-size-0-4-5;
+             color: $color-666;
+             display: flex;
+             flex-direction: row;
+             justify-content: space-between;
+             padding-bottom: 0.3rem;
+
+             .after-line:after{
+               content: '|';
+               color: $color-ddd;
+               margin: 0 0.1rem 0 0.2rem;
+             }
+           }
+
+           /*商家活动展示部分*/
+           .activity{
+             padding-bottom: 0.5rem;
+             display: flex;
+             flex-direction: row;
+             font-size: $font-size-0-5;
+             /*列表展示*/
+             .avtive-lists{
+               width: 70%;
+               .item{
+                 margin-top: 0.3rem;
+                 .item-icon{
+                   padding: 0.1rem;
+                   color: $color-fff;
+                   border-radius: 2px;
+                 }
+                 .text{
+                   color: $color-666;
+                 }
+               }
+             }
+             /*活动数量*/
+             .active-num{
+               width: 30%;
+               padding-top: 0.3rem;
+               color: $color-999;
+               font-size: $font-size-0-4-5;
+               text-align: right;
+               display: flex;
+               flex-direction: row;
+               justify-content: flex-end;
+               .active-down{
+                 display: inline-block;
+                 width: 0.3rem;
+                 height: 0.15rem;
+                 margin-top: 0.25rem;
+                 margin-left: 0.15rem;
+                 background: url("../../images/active-down.png") no-repeat;
+                 background-size: contain;
+               }
+             }
+           }
+         }
+       }
     }
 
-    .mint-tabbar{
-      position: fixed;
-      z-index: 5000;
+    .sort-popup{
+      width: 100%;
+      .mint-popup{
+        width: 100%;
+        top: 4.5rem;
+        .sort-lists{
+          padding: 0.5rem 0.8rem;
+          .item{
+            padding: 0.4rem 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            .label{
+              font-size: $font-size-0-6;
+              color: $color-333;
+            }
+            .select-icon{
+              width: 0.7rem;
+              height: 0.7rem;
+              background: url("../../images/select-icon.png") no-repeat;
+              background-size: contain;
+            }
+            .selected{
+              font-weight: bold;
+              color: $color-primay;
+            }
+          }
+        }
+      }
     }
   }
 </style>

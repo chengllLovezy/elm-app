@@ -48,7 +48,7 @@
 
           <div class="lists">
             <div v-for="cartFoodItem in cartDataLists">
-              <div class="item border-bottom-dashed">
+              <div class="item border-bottom-dashed" v-if="cartFoodItem.num">
                 <span class="item_name ellipsis">{{cartFoodItem.foods.name}}</span>
                 <span class="item_num">×{{cartFoodItem.num}}</span>
                 <span class="item_price">{{cartFoodItem.foods.price | currencyFilter}}</span>
@@ -57,13 +57,13 @@
             <div>
               <div class="item border-bottom-dashed">
                 <span class="item_name ellipsis">餐盒</span>
-                <span class="item_price">2</span>
+                <span class="item_price">{{2 | currencyFilter}}</span>
               </div>
             </div>
             <div>
               <div class="item border-bottom-dashed">
                 <span class="item_name ellipsis">配送费</span>
-                <span class="item_price">{{4}}</span>
+                <span class="item_price">{{4 | currencyFilter}}</span>
               </div>
             </div>
             <div class="red_packet">

@@ -129,7 +129,7 @@
             <div class="commit_wrap">
               <div class="score_box">
                 <div class="total_score">
-                  <div class="score_1">{{storeInfo.score.total_score}}</div>
+                  <div class="score_1">{{score.total_score}}</div>
                   <div class="score_2">综合评分</div>
                   <div class="score_3">高于周边商家72.0%</div>
                 </div>
@@ -140,7 +140,7 @@
                       <div class="score-default"></div>
                       <div class="score-active"></div>
                     </div>
-                    <div class="score_num">{{storeInfo.score.service_score}}</div>
+                    <div class="score_num">{{score.service_score}}</div>
                   </div>
                   <div class="goods_score">
                     <div class="score_label">商品评分</div>
@@ -148,7 +148,7 @@
                       <div class="score-default"></div>
                       <div class="score-active"></div>
                     </div>
-                    <div class="score_num">{{storeInfo.score.goods_score}}</div>
+                    <div class="score_num">{{score.goods_score}}</div>
                   </div>
                   <div class="time_score">
                     <div class="score_label">送达时间</div>
@@ -366,12 +366,13 @@
               that.cartHide = that.foodsSwiperOb.activeIndex === 0?true:false;
             }
           }
-        },
+        },//商品和评价的swiper对象配置项
         checkIconShow:true,//check的切换（只查看有内容的评价）
         balls:[
           {show:false}
         ],
         dropBalls:[],
+        score:{},//商家评分
         cartHide:true,//切换商品和评价隐藏底部购物车
         foodsDetailInfo:{},//点击打开食品详情时的食品信息
         foodsDetailShow:false,//食品详情显示切换
@@ -459,7 +460,7 @@
             let store = resdata.store;//商家所有信息
             this.menusLists = this.initMenuFoods(store);//商品和导航列表
             this.storeInfo = store;//商家所有信息
-            console.log(store)
+            this.score = store.score;
             this.initMenuFoodNum();
             //this.menusLists = store.foods_lists;//导航列表（包含食品列表）
 //            console.log(this.menusLists)
