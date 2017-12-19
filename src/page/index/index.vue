@@ -11,6 +11,9 @@
       name:'index',
       components:{
         footerTab
+      },
+      mounted(){
+        this.$router.push('home')
       }
     }
 </script>

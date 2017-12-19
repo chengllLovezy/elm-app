@@ -1,5 +1,21 @@
 <template>
     <div class="sellerCom">
+
+      <div class="opare-box">
+        <div class="opare border-bottom" ref="opareBox">
+          <div class="sort" @click="sortPopupHandler">
+            <span class="label ellipsis">{{sortText}}</span>
+            <span class="down-icon"></span>
+          </div>
+          <div class="favorite">好评优先</div>
+          <div class="distance">距离最近</div>
+          <div class="filter">
+            <span class="label">筛选</span>
+            <span class="filter-icon"></span>
+          </div>
+        </div>
+      </div>
+
       <div class="seller">
         <div class="seller-item border-bottom" v-for="item in seller" @click="goShop(item._id)">
           <div class="avater">
@@ -62,25 +78,52 @@
           </div>
         </div>
       </div>
+
+      <div class="sort-popup">
+        <mt-popup v-model="sortPopupShow" position="top">
+          <div class="sort-lists">
+            <div class="item" v-for="(sortItem,index) in sortData" :key="index" @click="sortSelectedHandler(index)">
+              <span class="label" :class="{selected:sortItem.selected}">{{sortItem.label}}</span>
+              <span class="select-icon" v-if="sortItem.selected"></span>
+            </div>
+          </div>
+        </mt-popup>
+      </div>
     </div>
 </template>
 
 <script>
-  import axios from 'axios'
   export default {
     name:'seller',
-    props:['sellerInfo','activityInfo'],
+    props:['storeInfo','activityInfo','storeBoxTop','headerHeight'],
     data(){
       return {
+        sortPopupShow:false,//综合排序点击popup
+        sortText:'综合排序',
+        sortData:[
+          {label:'综合排序',selected:true},
+          {label:'销量最高',selected:false},
+          {label:'起送价最低',selected:false},
+          {label:'配送最快',selected:false},
+          {label:'配送费最低',selected:false},
+          {label:'人均从低到高',selected:false},
+          {label:'人均从高到低',selected:false}
+        ],
         baseImgUrl:'https://fuss10.elemecdn.com'
       }
     },
     computed:{
       seller(){
-        return this.sellerInfo;
+        return this.storeInfo;
       },
       activity(){
         return this.activityInfo;
+      },
+      storeT(){
+        return this.storeBoxTop;
+      },
+      headerH(){
+        return this.headerHeight;
       }
     },
     methods:{
@@ -92,9 +135,49 @@
       goShop(store_id){
         this.$router.push({path:'shop',query: { store_id: store_id }})
       },
+      // 监听滚动条事件
+      scrollHandler(){
+        let opareBox = this.$refs.opareBox || null;
+        let scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+        let storeT = this.storeT || 0;//store距离文档顶端的距离
+        let headerH = this.headerH || 0;//头部定位元素的高度
+        let dis = storeT - headerH - scrollTop;
+        if(opareBox){
+          if(dis<=0){
+            opareBox.style.position = 'fixed';
+            opareBox.style.top = headerH + 'px';
+          }else{
+            opareBox.style.position = 'absolute';
+            opareBox.style.top = 0;
+          }
+        }
+      },
+      // 综合排序点击popup
+      sortPopupHandler(){
+        let storeT = this.storeT;//store距离文档顶端的距离
+        let headerH = this.headerH;//头部定位元素的高度
+        let dis = storeT - headerH;
+        window.scrollTo(0,dis);
+        this.sortPopupShow = !this.sortPopupShow;
+      },
+      // 综合排序点击切换
+      sortSelectedHandler(i){
+        this.sortData.forEach((item,index)=>{
+          if(index === i){
+            item.selected = true;
+            this.sortText = item.label;
+          }else{
+            this.sortPopupShow = false;
+            item.selected = false
+          }
+        });
+      }
     },
     mounted(){
       this.init();
+      this.$nextTick(()=>{
+        window.addEventListener('scroll',this.scrollHandler,false);
+      })
     }
   }
 </script>
@@ -102,79 +185,74 @@
 <style lang="scss" scoped>
   @import "../../style/base.scss";
   .sellerCom{
+    position: relative;
+    .opare-box{
+      width: 100%;
+      height: 2rem;
+      position: relative;
+      z-index: 1500;
+      .opare{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 2rem;
+        background: $background-fff;
+        padding: 0 0.5rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        font-size: $font-size-0-6;
+        color: $color-666;
+        .sort{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-start;
+          .label{
+            width: 2.6rem;
+            font-size: $font-size-0-6;
+            color: $color-333;
+            font-weight: bold;
+          }
+          .down-icon{
+            width: 0.5rem;
+            height: 1rem;
+            margin-left: 0.2rem;
+            background: url("../../images/down-icon-01.png") no-repeat;
+            background-size: contain;
+          }
+        }
+        .favorite,.distance{
+          text-align: center;
+          width: 25%;
+        }
+        .filter{
+          text-align: center;
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+          align-items: center;
+          .label{
+            font-size: $font-size-0-6;
+            color: $color-666;
+          }
+          .filter-icon{
+            width: 0.55rem;
+            height: 0.55rem;
+            margin-left: 0.2rem;
+            background: url("../../images/filter-icon.jpg") no-repeat;
+            background-size: contain;
+          }
+        }
+      }
+    }
+
     .seller{
       background: $background-fff;
       /*margin-top: 0.5rem;
       padding: 0.8rem 0;*/
-
-      .seller-title{
-        padding: 0 0.5rem;
-        font-size: $font-size-0-7;
-        font-weight: bold;
-      }
-
-      .opare-box{
-        width: 100%;
-        height: 2rem;
-        position: relative;
-        z-index: 4000;
-        .opare{
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 2rem;
-          background: $background-fff;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-          font-size: $font-size-0-6;
-          color: $color-666;
-          .sort{
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: flex-start;
-            .label{
-              width: 2.6rem;
-              font-size: $font-size-0-6;
-              color: $color-333;
-              font-weight: bold;
-            }
-            .down-icon{
-              width: 0.5rem;
-              height: 1rem;
-              margin-left: 0.2rem;
-              background: url("../../images/down-icon-01.png") no-repeat;
-              background-size: contain;
-            }
-          }
-          .favorite,.distance{
-            text-align: center;
-            width: 25%;
-          }
-          .filter{
-            text-align: center;
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-end;
-            align-items: center;
-            .label{
-              font-size: $font-size-0-6;
-              color: $color-666;
-            }
-            .filter-icon{
-              width: 0.55rem;
-              height: 0.55rem;
-              margin-left: 0.2rem;
-              background: url("../../images/filter-icon.jpg") no-repeat;
-              background-size: contain;
-            }
-          }
-        }
-      }
       /*商家列表item*/
       .seller-item{
         display: flex;
@@ -327,6 +405,38 @@
                 background: url("../../images/active-down.png") no-repeat;
                 background-size: contain;
               }
+            }
+          }
+        }
+      }
+    }
+
+    .sort-popup {
+      width: 100%;
+      .mint-popup {
+        width: 100%;
+        top: 4.5rem;
+        .sort-lists {
+          padding: 0.5rem 0.8rem;
+          .item {
+            padding: 0.4rem 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            .label {
+              font-size: $font-size-0-6;
+              color: $color-333;
+            }
+            .select-icon {
+              width: 0.7rem;
+              height: 0.7rem;
+              background: url("../../images/select-icon.png") no-repeat;
+              background-size: contain;
+            }
+            .selected {
+              font-weight: bold;
+              color: $color-primay;
             }
           }
         }
