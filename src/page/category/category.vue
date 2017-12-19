@@ -72,7 +72,7 @@
         <div class="category_box">
           <div class="category_nav">
             <div class="list">
-              <div class="item border-right" v-for="(item,index) in category" :key="index" @click.stop="selectedCategory($event)">
+              <div class="item border-right" v-for="(item,index) in category" :class="{active:index==categoryIndex}" :key="index" @click.stop="selectedCategory(index)">
                 <div class="item_content">
                   <span class="name">{{item.text}}</span>
                   <span class="num border-02">{{2000}}</span>
@@ -115,6 +115,7 @@
         headerHeight:0,
         navShow:false,
         category:[],
+        categoryIndex:0,
         baseImgUrl:'https://fuss10.elemecdn.com'
       }
     },
@@ -138,9 +139,8 @@
         this.storeBoxTop = storeBox.offsetTop;
         this.headerHeight = header.offsetHeight;
       },
-      selectedCategory(ev){
-        let target = ev.target;
-        console.log(target)
+      selectedCategory(index){
+        this.categoryIndex = index;
       },
       goBack(){
         this.$router.go(-1);
