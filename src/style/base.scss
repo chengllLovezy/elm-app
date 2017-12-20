@@ -115,6 +115,18 @@ $font-size-2-0:2.0rem;
   bottom: -1px;
   left: 0;
 }
+.border-top{
+  position: relative;
+}
+.border-top:after{
+  content: '';
+  width: 100%;
+  height: 1px;
+  border-bottom:1px solid #ccc;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+}
 .border-bottom-dotted{
   position: relative;
 }
@@ -144,7 +156,7 @@ $font-size-2-0:2.0rem;
 }
 .border-left:after{
   content: '';
-  width: 100%;
+  width: 200%;
   height: 100%;
   border-left:1px solid #eee;
   position: absolute;
@@ -166,6 +178,10 @@ $font-size-2-0:2.0rem;
 //定义设备像素比
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio:2) {
   .border-bottom:after{
+    transform: scaleY(0.5);
+    transform-origin: 0 0;
+  }
+  .border-top:after{
     transform: scaleY(0.5);
     transform-origin: 0 0;
   }

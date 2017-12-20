@@ -80,6 +80,8 @@
               this.personActive = true;
               break;
           }
+
+          this.$router.push(el)
         },
         tabItem(){
           let selected = this.selected;

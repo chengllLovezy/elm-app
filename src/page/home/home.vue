@@ -2,7 +2,7 @@
     <div class="home">
       <div class="header" ref="searchBox">
         <div class="address-wrap">
-          <div class="address-box">
+          <div class="address-box" @click="goAddress">
             <span class="address-icon"></span>
             <span class="address-text">地址</span>
             <span class="down-icon"></span>
@@ -12,7 +12,7 @@
         <!--搜索商品-->
         <div class="search-hide">
           <div class="search-box">
-            <div class="search-wrap">
+            <div class="search-wrap" @click="goSearch">
               <span class="search-icon"></span>
               <span class="search-text">搜索商家、商品名称</span>
             </div>
@@ -200,6 +200,12 @@ import { home } from '../../service/getData'
           let storeBoxT = this.$refs.storeBox.offsetTop;
           this.storeBoxTop = storeBoxT;
           this.headerHeight = headerBoxH;
+        },
+        goSearch(){
+          this.$router.push('search')
+        },
+        goAddress(){
+          this.$router.push('address')
         }
       },
       updated() {
@@ -224,6 +230,8 @@ import { home } from '../../service/getData'
     padding-bottom: 2.3rem;
 
     .header{
+      position: relative;
+      z-index: 3000;
       background: $background-primay;
       /*地址*/
       .address-wrap{

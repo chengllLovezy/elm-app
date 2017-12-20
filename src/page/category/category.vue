@@ -9,8 +9,12 @@
           </div>
           <div class="nav" v-show="!navShow">
             <div class="list">
-              <div class="item" v-for="(item,index) in navData" :key="index" :class="{active:item.selected}">
-                {{item.label}}
+              <div class="list_box">
+                <div class="hide">
+                  <div class="item" v-for="(item,index) in navData" :key="index" :class="{active:index==navIndex}" @click="navSelected(index)">
+                    {{item.label}}
+                  </div>
+                </div>
               </div>
               <div class="down_icon" @click="navShow = !navShow"></div>
             </div>
@@ -68,31 +72,34 @@
         <seller :storeBoxTop="storeBoxTop" :headerHeight="headerHeight" :storeInfo="storeInfo" :activityInfo="activity"></seller>
       </div>
 
-      <mt-popup v-model="navShow" position="top">
-        <div class="category_box">
-          <div class="category_nav">
-            <div class="list">
-              <div class="item border-right" v-for="(item,index) in category" :class="{active:index==categoryIndex}" :key="index" @click.stop="selectedCategory(index)">
-                <div class="item_content">
-                  <span class="name">{{item.text}}</span>
-                  <span class="num border-02">{{2000}}</span>
+      <div class="nav_popup">
+        <mt-popup v-model="navShow" position="top">
+          <div class="category_box">
+            <div class="category_nav">
+              <div class="list">
+                <div class="item border-right" v-for="(item,index) in category" :class="{active:index==categoryIndex}" :key="index" @click.stop="selectedCategory(index)">
+                  <div class="item_content">
+                    <span class="name">{{item.text}}</span>
+                    <span class="num border-02">{{2000}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="category_subnav">
+              <div class="list">
+                <div class="item" v-for="(item,index) in category" :key="index">
+                  <div class="item_content">
+                    <img :src="baseImgUrl+item.imgUrl" alt="">
+                    <span class="name">{{item.text}}</span>
+                    <span class="num border-02">{{2000}}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="category_subnav">
-            <div class="list">
-              <div class="item" v-for="(item,index) in category" :key="index">
-                <div class="item_content">
-                  <img :src="baseImgUrl+item.imgUrl" alt="">
-                  <span class="name">{{item.text}}</span>
-                  <span class="num border-02">{{2000}}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </mt-popup>
+        </mt-popup>
+      </div>
+
     </div>
 </template>
 
@@ -104,11 +111,15 @@
     data(){
       return {
         navData:[
-          {label:'全部',selected:true},
-          {label:'香锅冒菜',selected:false},
-          {label:'简餐便当',selected:false},
-          {label:'面食粥点',selected:false}
+          {label:'全部'},
+          {label:'香锅冒菜'},
+          {label:'简餐便当'},
+          {label:'面食粥点'},
+          {label:'香锅冒菜'},
+          {label:'简餐便当'},
+          {label:'面食粥点'}
         ],
+        navIndex:0,
         storeInfo:[],
         activity:[],
         storeBoxTop:0,
@@ -131,6 +142,9 @@
           this.storeInfo = res.store;
           this.activity = appData.activity_style;
         })
+      },
+      navSelected(index){
+        this.navIndex = index;
       },
       getStoreBoxHeight(){
         let scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
@@ -170,7 +184,7 @@
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 2100;
+        z-index: 2300;
         .header_back{
           padding: 0.5rem;
           display: flex;
@@ -201,18 +215,44 @@
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            .item{
+            .list_box{
               flex: 1;
-              color: $color-fff;
-              font-size: $font-size-0-6;
-              opacity: 0.8;
-              padding: 0.3rem 0;
-              text-align: center;
-            }
-            .active{
-              opacity: 1;
-              font-weight: bold;
-              border-bottom: 2px solid #ffffff;
+              overflow-x: auto;
+              position: relative;
+              height: 1.6rem;
+              .hide{
+                position: absolute;
+                top: 0;
+                left: 0;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                .item{
+                  width: 3rem;
+                  color: $color-fff;
+                  font-size: $font-size-0-6;
+                  opacity: 0.8;
+                  height: 1.6rem;
+                  line-height: 1.6rem;
+                  text-align: center;
+                }
+                .active{
+                  opacity: 1;
+                  font-weight: bold;
+                  border-bottom: 2px solid #ffffff;
+                }
+              }
+              .list_box:after{
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 0.4rem;
+                height: 1.4rem;
+                background: url("../../images/line-icon-02.png") no-repeat;
+                background-size: contain;
+              }
             }
             .down_icon{
               width: 0.7rem;
@@ -222,16 +262,6 @@
               background: url("../../images/down-icon-02.png") no-repeat;
               background-size: contain;
               position: relative;
-              &:after{
-                content: '';
-                position: absolute;
-                top: -0.4rem;
-                left: -1.1rem;
-                width: 0.4rem;
-                height: 1.4rem;
-                background: url("../../images/line-icon-02.png") no-repeat;
-                background-size: contain;
-              }
             }
           }
         }
@@ -339,14 +369,17 @@
       margin-top: 0.5rem;
     }
 
-    .mint-popup{
+    .nav_popup{
       width: 100%;
+      position: relative;
+      z-index: 2200;
+      .mint-popup{
+        width: 100%;
+        top: 3.5rem;
+      }
     }
     .category_box{
       width: 100%;
-      position: absolute;
-      top: 3.5rem;
-      left: 0;
       background: #ffffff;
       display: flex;
       flex-direction: row;

@@ -79,12 +79,12 @@
         </div>
       </div>
 
-      <div class="sort-popup">
+      <div class="sort-popup" ref="sortPopup">
         <mt-popup v-model="sortPopupShow" position="top">
           <div class="sort-lists">
             <div class="item" v-for="(sortItem,index) in sortData" :key="index" @click="sortSelectedHandler(index)">
-              <span class="label" :class="{selected:sortItem.selected}">{{sortItem.label}}</span>
-              <span class="select-icon" v-if="sortItem.selected"></span>
+              <span class="label" :class="{selected:index==selectedIndex}">{{sortItem.label}}</span>
+              <span class="select-icon" v-if="index==selectedIndex"></span>
             </div>
           </div>
         </mt-popup>
@@ -101,14 +101,15 @@
         sortPopupShow:false,//综合排序点击popup
         sortText:'综合排序',
         sortData:[
-          {label:'综合排序',selected:true},
-          {label:'销量最高',selected:false},
-          {label:'起送价最低',selected:false},
-          {label:'配送最快',selected:false},
-          {label:'配送费最低',selected:false},
-          {label:'人均从低到高',selected:false},
-          {label:'人均从高到低',selected:false}
+          {label:'综合排序'},
+          {label:'销量最高'},
+          {label:'起送价最低'},
+          {label:'配送最快'},
+          {label:'配送费最低'},
+          {label:'人均从低到高'},
+          {label:'人均从高到低'}
         ],
+        selectedIndex:0,
         baseImgUrl:'https://fuss10.elemecdn.com'
       }
     },
@@ -154,29 +155,32 @@
       },
       // 综合排序点击popup
       sortPopupHandler(){
+        let h = this.$refs.opareBox.offsetHeight;
         let storeT = this.storeT;//store距离文档顶端的距离
         let headerH = this.headerH;//头部定位元素的高度
         let dis = storeT - headerH;
+        let sortPopup = this.$refs.sortPopup.getElementsByClassName('mint-popup')[0];
+        sortPopup.style.top = (headerH + h) + 'px';
         window.scrollTo(0,dis);
         this.sortPopupShow = !this.sortPopupShow;
       },
       // 综合排序点击切换
       sortSelectedHandler(i){
-        this.sortData.forEach((item,index)=>{
-          if(index === i){
-            item.selected = true;
-            this.sortText = item.label;
-          }else{
-            this.sortPopupShow = false;
-            item.selected = false
-          }
-        });
+        this.selectedIndex = i;
+        this.sortPopupShow = false;
+      },
+      scrollCancleHandler(ev){
+        if(this.sortPopupShow){
+          ev.preventDefault();
+        }
+        return;
       }
     },
     mounted(){
       this.init();
       this.$nextTick(()=>{
         window.addEventListener('scroll',this.scrollHandler,false);
+        window.addEventListener('touchmove',this.scrollCancleHandler,{passive: false});
       })
     }
   }
@@ -190,7 +194,7 @@
       width: 100%;
       height: 2rem;
       position: relative;
-      z-index: 1500;
+      z-index: 2100;
       .opare{
         position: absolute;
         left: 0;
