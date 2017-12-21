@@ -19,7 +19,7 @@ Object.keys(filter).forEach(key=>{
 
 Vue.component('icon',Icon);
 Vue.use(Mini);
-Vue.use(VueAwesomeSwiper)
+Vue.use(VueAwesomeSwiper);
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
